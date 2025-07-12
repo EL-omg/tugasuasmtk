@@ -5,7 +5,7 @@ import plotly.express as px
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="EOQ Optimization for Smartphone Components",
+    page_title="EOQ Optimizationfor For Toko Buku Cerdas",
     page_icon="📱",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -75,8 +75,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Title and Introduction ---
-st.title("📱 EOQ Optimization for Smartphone Components")
-st.markdown("### *Meningkatkan Efisiensi Persediaan Layar LCD*")
+st.title("📱 EOQ Optimization for Toko buku")
+st.markdown("### *Meningkatkan Efisiensi toko buku*")
 st.write("""
 Selamat datang di aplikasi simulasi Economic Order Quantity (EOQ)!
 Aplikasi ini membantu Anda mengoptimalkan jumlah pemesanan komponen, seperti layar LCD,
