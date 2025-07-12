@@ -221,4 +221,32 @@ with tab3:
             step_q = max(1, int(eoq / 50))
 
             quantities, cost_order, cost_hold, cost_total = [], [], [], []
-            for q in range(min_q)
+         for q in range(min_q, max_q + 1, step_q):
+                order_cost = (D / q) * S
+                holding_cost = (q / 2) * H
+                total_cost = order_cost + holding_cost
+
+                quantities.append(q)
+                cost_order.append(order_cost)
+                cost_hold.append(holding_cost)
+                cost_total.append(total_cost)
+
+            df_plot = pd.DataFrame({
+                "Kuantitas Pesanan": quantities,
+                "Biaya Pemesanan": cost_order,
+                "Biaya Penyimpanan": cost_hold,
+                "Total Biaya": cost_total,
+            })
+
+            fig = px.line(
+                df_plot,
+                x="Kuantitas Pesanan",
+                y=["Biaya Pemesanan", "Biaya Penyimpanan", "Total Biaya"],
+                labels={"value": "Biaya (Rp)", "variable": "Jenis Biaya"},
+                title="Kurva Biaya terhadap Kuantitas Pesanan",
+                template="simple_white"
+            )
+            fig.update_layout(legend_title_text='')
+
+            st.plotly_chart(fig, use_container_width=True)
+
