@@ -95,7 +95,7 @@ with tab2:
     with col1:
         D = st.number_input(
             "Permintaan Tahunan (D) - unit/tahun",
-            min_value=0,
+            min_value=1,
             value=4800,
             step=100,
             format="%d",
@@ -103,7 +103,7 @@ with tab2:
         )
         S = st.number_input(
             "Biaya Pemesanan (S) - Rp/pesanan",
-            min_value=0,
+            min_value=1,
             value=100_000,
             step=10_000,
             format="%d",
@@ -112,7 +112,7 @@ with tab2:
     with col2:
         H = st.number_input(
             "Biaya Penyimpanan (H) - Rp/unit/tahun",
-            min_value=0,
+            min_value=1,
             value=2_000,
             step=500,
             format="%d",
@@ -122,19 +122,8 @@ with tab2:
 
     # Button di bawah input
     if st.button("Hitung EOQ", key="calc_btn"):
-        if D <= 0 or S <= 0 or H <= 0:
-            st.error("Semua input harus lebih besar dari nol.")
-            st.session_state.calculate = False
-        else:
-            st.session_state.calculate = True
-            st.session_state.params = {
-                "D": D,
-                "S": S,
-                "H": H,
-                "bulat": bulat,
-            }
-    elif "calculate" not in st.session_state:
-        st.session_state.calculate = False
+        st.session_state.calculate = True
+        st.session_state.params = {"D": D, "S": S, "H": H, "bulat": bulat}
 
 # ---------- Tab 3: Results & Analysis ----------
 with tab3:
@@ -158,9 +147,7 @@ with tab3:
             total_ordering_cost = math.ceil(orders_per_year) * S
             total_holding_cost = (eoq / 2) * H
             total_inventory_cost = total_ordering_cost + total_holding_cost
-            total_inventory_disp = (
-                f"Rp {total_inventory_cost:,.0f}" if bulat else f"Rp {total_inventory_cost:,.2f}"
-            )
+            total_inventory_disp = f"Rp {total_inventory_cost:,.0f}" if bulat else f"Rp {total_inventory_cost:,.2f}"
 
             # ----- Display Metrics -----
             st.success("Perhitungan berhasil!")
@@ -208,20 +195,24 @@ with tab3:
             # ----- Recommendation -----
             st.markdown("### Rekomendasi")
             st.write(
-                f"Dengan memesan sekitar **{eoq_disp} unit** tiap kali (\~**{orders_disp}** pesanan/tahun), "
-                "Toko Buku *Cerdas* dapat meminimalkan total biaya persediaan menjadi "
-                f"{total_inventory_disp}.")
+                f"Dengan memesan sekitar **{eoq_disp} unit** tiap kali (~**{orders_disp}** pesanan/tahun), "
+                f"Toko Buku *Cerdas* dapat meminimalkan total biaya persediaan menjadi {total_inventory_disp}.")
 
             # ----- Visualization -----
             st.markdown("### Visualisasi Biaya EOQ")
             st.write("Kurva di bawah menunjukkan perubahan biaya pemesanan, penyimpanan, dan total terhadap variasi jumlah pesanan.")
 
+            # Generate data for cost curves
             min_q = max(1, int(eoq * 0.1))
             max_q = int(eoq * 2)
             step_q = max(1, int(eoq / 50))
 
-            quantities, cost_order, cost_hold, cost_total = [], [], [], []
-         for q in range(min_q, max_q + 1, step_q):
+            quantities = []
+            cost_order = []
+            cost_hold = []
+            cost_total = []
+
+            for q in range(min_q, max_q + 1, step_q):
                 order_cost = (D / q) * S
                 holding_cost = (q / 2) * H
                 total_cost = order_cost + holding_cost
@@ -232,21 +223,57 @@ with tab3:
                 cost_total.append(total_cost)
 
             df_plot = pd.DataFrame({
-                "Kuantitas Pesanan": quantities,
+                "Jumlah Pesanan": quantities,
                 "Biaya Pemesanan": cost_order,
                 "Biaya Penyimpanan": cost_hold,
                 "Total Biaya": cost_total,
             })
 
+            df_melt = df_plot.melt(id_vars=["Jumlah Pesanan"], var_name="Jenis Biaya", value_name="Biaya (Rp)")
+
             fig = px.line(
-                df_plot,
-                x="Kuantitas Pesanan",
-                y=["Biaya Pemesanan", "Biaya Penyimpanan", "Total Biaya"],
-                labels={"value": "Biaya (Rp)", "variable": "Jenis Biaya"},
-                title="Kurva Biaya terhadap Kuantitas Pesanan",
+                df_melt,
+                x="Jumlah Pesanan",
+                y="Biaya (Rp)",
+                color="Jenis Biaya",
+                title="Kurva Biaya EOQ",
+                labels={"Biaya (Rp)": "Biaya (Rp)", "Jumlah Pesanan": "Jumlah Pesanan (Unit)"},
+                hover_data={"Biaya (Rp)":":,.0f"},
                 template="simple_white"
             )
-            fig.update_layout(legend_title_text='')
+
+            # Tambahkan garis vertikal pada EOQ
+            fig.add_vline(
+                x=eoq,
+                line_dash="dash",
+                line_color="red",
+                annotation_text=f"EOQ ≈ {round(eoq):,}",
+                annotation_position="top right",
+            )
+
+            fig.update_layout(hovermode="x unified", legend_title_text="")
 
             st.plotly_chart(fig, use_container_width=True)
 
+        except Exception as ex:
+            st.error(f"Terjadi kesalahan perhitungan atau visualisasi: {ex}")
+    else:
+        st.info("Masukkan data pada tab 'Input Data' lalu tekan 'Hitung EOQ' untuk melihat hasil.")
+
+# ---------- Tab 4: FAQ ----------
+with tab4:
+    st.header("❓ Pertanyaan Umum (FAQ)")
+    st.subheader("Mengapa EOQ penting?")
+    st.write(
+        "EOQ membantu menyeimbangkan biaya pemesanan dan biaya penyimpanan, sehingga total biaya persediaan dapat diminimalkan.")
+    st.subheader("Apakah asumsi EOQ selalu berlaku?")
+    st.write(
+        "Model EOQ memiliki asumsi permintaan dan lead time konstan; jika tidak terpenuhi, pertimbangkan penyesuaian dengan safety stock atau model lain.")
+
+# ---------- Footer ----------
+st.markdown(
+    "---
+<p style='text-align:center; color:gray;'>
+Aplikasi ini dibuat untuk tujuan edukasi — Studi Kasus EOQ Toko Buku Cerdas.
+</p>",
+    unsafe_allow_html=True)
