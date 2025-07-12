@@ -121,14 +121,14 @@ with tab2:
         "Biaya Pemesanan (S) - Rp/order",
         min_value=0, # Changed from 1000 to 0
         value=0,     # Set default value to 0
-        step=1000,
+        step=0,
         help="Biaya untuk menempatkan satu pesanan, tidak termasuk biaya unit. Masukkan angka bulat."
     )
     holding_cost = st.number_input(
         "Biaya Penyimpanan (H) - Rp/unit/tahun",
         min_value=0, # Changed from 100 to 0
         value=0,     # Set default value to 0
-        step=10,
+        step=0,
         help="Biaya untuk menyimpan satu unit layar LCD selama satu tahun. Masukkan angka bulat."
     )
 
