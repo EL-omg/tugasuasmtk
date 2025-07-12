@@ -116,6 +116,21 @@ with tab2:
             help="Biaya menyimpan satu unit selama setahun."
         )
         bulat = st.checkbox("Tampilkan hasil bulat", value=True, key="round_pref")
+         # Button di bawah input
+    if st.button("Hitung EOQ", key="calc_btn"):
+        if D <= 0 or S <= 0 or H <= 0:
+            st.error("Semua input harus lebih besar dari nol.")
+            st.session_state.calculate = False
+        else:
+            st.session_state.calculate = True
+            st.session_state.params = {
+                "D": D,
+                "S": S,
+                "H": H,
+                "bulat": bulat,
+            }
+    elif "calculate" not in st.session_state:
+        st.session_state.calculate = False
 
 
 # ---------- Tab 3: Results & Analysis ----------
