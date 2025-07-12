@@ -269,11 +269,3 @@ with tab4:
     st.subheader("Apakah asumsi EOQ selalu berlaku?")
     st.write(
         "Model EOQ memiliki asumsi permintaan dan lead time konstan; jika tidak terpenuhi, pertimbangkan penyesuaian dengan safety stock atau model lain.")
-
-# ---------- Footer ----------
-st.markdown(
-    "---
-<p style='text-align:center; color:gray;'>
-Aplikasi ini dibuat untuk tujuan edukasi — Studi Kasus EOQ Toko Buku Cerdas.
-</p>",
-    unsafe_allow_html=True)
