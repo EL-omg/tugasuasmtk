@@ -88,50 +88,35 @@ with tab2:
     st.header("📊 Masukkan Data Anda")
     st.write("Isi parameter berikut untuk menghitung EOQ.")
 
-    # ---- Sidebar Inputs ----
-    st.sidebar.header("Parameter Input")
-    D = st.sidebar.number_input(
-        "Permintaan Tahunan (D) - unit/tahun",
-        min_value=0,
-        value=0,
-        step=1,
-        format="%d",
-        help="Jumlah unit yang dibutuhkan dalam setahun."
-    )
-    S = st.sidebar.number_input(
-        "Biaya Pemesanan (S) - Rp/pesanan",
-        min_value=0,
-        value=0,
-        step=1000,
-        format="%d",
-        help="Biaya sekali memesan (tidak termasuk biaya unit)."
-    )
-    H = st.sidebar.number_input(
-        "Biaya Penyimpanan (H) - Rp/unit/tahun",
-        min_value=0,
-        value=0,
-        step=100,
-        format="%d",
-        help="Biaya menyimpan satu unit selama setahun."
-    )
+    col1, col2 = st.columns(2)
+    with col1:
+        D = st.number_input(
+            "Permintaan Tahunan (D) - unit/tahun",
+            min_value=0,
+            value=0,
+            step=1,
+            format="%d",
+            help="Jumlah unit yang dibutuhkan dalam setahun."
+        )
+        S = st.number_input(
+            "Biaya Pemesanan (S) - Rp/pesanan",
+            min_value=0,
+            value=0,
+            step=1000,
+            format="%d",
+            help="Biaya sekali memesan (tidak termasuk biaya unit)."
+        )
+    with col2:
+        H = st.number_input(
+            "Biaya Penyimpanan (H) - Rp/unit/tahun",
+            min_value=0,
+            value=0,
+            step=100,
+            format="%d",
+            help="Biaya menyimpan satu unit selama setahun."
+        )
+        bulat = st.checkbox("Tampilkan hasil bulat", value=True, key="round_pref")
 
-    bulat = st.sidebar.checkbox("Tampilkan hasil bulat", value=True, key="round_pref")
-
-    # ---- Hitung EOQ Button ----
-    if st.button("Hitung EOQ"):
-        if D <= 0 or S <= 0 or H <= 0:
-            st.error("Semua input harus lebih besar dari nol.")
-            st.session_state.calculate = False
-        else:
-            st.session_state.calculate = True
-            st.session_state.params = {
-                "D": D,
-                "S": S,
-                "H": H,
-                "bulat": bulat,
-            }
-    elif "calculate" not in st.session_state:
-        st.session_state.calculate = False
 
 # ---------- Tab 3: Results & Analysis ----------
 with tab3:
